@@ -30,7 +30,7 @@ export interface AuthProviderBaseProps {
      * }
      * ```
      */
-    onSigninCallback?: (user: User | undefined) => Promise<void> | void;
+    onSigninCallback: (user: User | undefined) => Promise<void> | void;
 
     /**
      * By default, if the page url has code/state params, this provider will call automatically the `userManager.signinCallback`.
@@ -304,13 +304,26 @@ export const AuthProvider = (props: AuthProviderProps): React.JSX.Element => {
         if (onRemoveUser) await onRemoveUser();
     }, [userManager, onRemoveUser]);
 
+    const callSigninCallback = React.useCallback(async (url: string) => { 
+        let user: User | void | null = null;
+        try {
+            user = await userManager.signinCallback(url);
+            user = !user ? await userManager.getUser() : user;
+            await onSigninCallback(user || undefined);
+            dispatch({ type: "INITIALISED", user });  
+        } catch (error) {
+            dispatch({ type: "ERROR", error: signinError(error) });
+        }
+    }, [onSigninCallback, userManager]);
+
     const contextValue = React.useMemo(() => {
         return {
             ...state,
             ...userManagerContext,
             removeUser,
+            callSigninCallback,
         };
-    }, [state, userManagerContext, removeUser]);
+    }, [state, userManagerContext, removeUser, callSigninCallback]);
 
     return (
         <AuthContext.Provider value={contextValue}>
