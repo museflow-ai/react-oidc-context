@@ -27,6 +27,8 @@ export const AuthContext: React_2.Context<AuthContextProps | undefined>;
 // @public (undocumented)
 export interface AuthContextProps extends AuthState {
     // (undocumented)
+    callSigninCallback(url: string): Promise<void>;
+    // (undocumented)
     clearStaleState(): Promise<void>;
     // (undocumented)
     readonly events: UserManagerEvents;
@@ -65,7 +67,7 @@ export interface AuthProviderBaseProps {
     children?: React_2.ReactNode;
     matchSignoutCallback?: (args: UserManagerSettings) => boolean;
     onRemoveUser?: () => Promise<void> | void;
-    onSigninCallback?: (user: User | undefined) => Promise<void> | void;
+    onSigninCallback: (user: User | undefined) => Promise<void> | void;
     onSignoutCallback?: (resp: SignoutResponse | undefined) => Promise<void> | void;
     skipSigninCallback?: boolean;
 }
